@@ -17,7 +17,7 @@ using namespace std; //for native use of string
 
 bool live=true;
 
-//string to hold data from pyton program
+//string to hold data from external program
 string carte_name;
 string carte_ip;
 string scene="-";
@@ -34,7 +34,6 @@ bool timertitreur=false;
 //safe queue to put message in
 Queue<string> q;
 Timer t;
-
 
 //C object of hardware
 Carte mycarte;

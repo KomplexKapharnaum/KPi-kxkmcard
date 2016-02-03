@@ -6,8 +6,6 @@
 //
 //
 
-
-
 #include "extSPI.h"
 
 #include <stdio.h>
@@ -39,12 +37,6 @@
 #include "main.h"
 
 
-
-
-
-
-
-
 //update status on remote, call at load and if status (status, scene, tension... change)
 void sendStatusTeleco(){
   float tension = mycarte.checkTension();
@@ -63,7 +55,6 @@ void sendStatusTeleco(){
   sprintf(mess2,"%s",buttonline.c_str());
   myteleco.sendString(mess1,mess2,T_MENU_ID_SHOW_STATUS);
 }
-
 
 
 //test output light, titreur
@@ -98,9 +89,9 @@ void testRoutine(int n){
 
 
 
-//parse pyton or bash input from stdin
+//parse input from stdin
 int parseInput(string input){
-  
+
   if (input=="check_teleco_on_start"){
     //init teleco if already connected // ISSUE HERE
     produce(q,"start_interrupt");
@@ -154,7 +145,7 @@ int parseInput(string input){
 
     return 0;
   }
-  
+
   if (input=="interrupt_carte") {
     //fprintf(stderr, "main - interrupt from carte\n");
     if (digitalRead(20)==LOW) return 2;
@@ -164,7 +155,7 @@ int parseInput(string input){
     if(mycarte.needStatusUpdate) sendStatusTeleco();
     return 0;
   }
-  
+
   if (input=="initcarte_local") {
     fprintf(stderr, "main - init teleco with local poweroff\n");
     myteleco.initCarte(1);
@@ -172,7 +163,7 @@ int parseInput(string input){
     delay(10);
     return 0;
   }
-  
+
   if (input=="initcarte_main") {
     fprintf(stderr, "main - init teleco with main program poweroff\n");
     myteleco.initCarte(0);
@@ -181,7 +172,7 @@ int parseInput(string input){
 
     return 0;
   }
-  
+
   if (input=="kill") {
     //turn off light
     mycarte.setRelais(0);
@@ -201,7 +192,7 @@ int parseInput(string input){
     live=false;
     delay(10);
   }
-  
+
   if (input=="start_timer_for_titreur") {
     timertitreur=true;
     t.create(0, 20,
@@ -211,12 +202,12 @@ int parseInput(string input){
              });
     return 0;
   }
-  
+
   if (input=="update_titreur") {
     mytitreur.updateText();
     return 0;
   }
-  
+
   //other message from main program or stdin
   fprintf(stderr, "\n\x1b[33mGETCOMMAND : %s\n\x1b[0m",input.c_str());
   stringstream ss(input);
@@ -265,7 +256,7 @@ int parseInput(string input){
         }
       }
       init=1;
-      
+
       mytitreur.allLedOff();
       mytitreur.twolineText(carte_name,carte_ip,NO_SCROLL_NORMAL);
       produce(q,"initcarte_main");
@@ -284,7 +275,7 @@ int parseInput(string input){
       //mytitreur.putChar(0,0,'S');
       produce(q,"initcarte_local");
     }
-    
+
   }else{
     //init passed, parse others
     if ("info"==parsedInput) {
@@ -301,7 +292,7 @@ int parseInput(string input){
       }
       sendStatusTeleco();
     }
-    
+
     if ("popup"==parsedInput) {
       //send data to the remote
       char mess1[17];
@@ -339,13 +330,13 @@ int parseInput(string input){
       strncpy(mess2, popup[type][1].c_str(), sizeof(mess2));
       if(type!=0)myteleco.sendString(mess1,mess2,type);
     }
-    
-    
-    
+
+
+
     if ("initconfig"==parsedInput) {
       fprintf(stderr, "main - error already init\n");
     }
-    
+
     if ("texttitreur"==parsedInput) {
       //write on titreur
       mytitreur.allLedOff();
@@ -375,7 +366,7 @@ int parseInput(string input){
         }
         if ("-type"==parsedInput){
           ss>>parsedInput;
-          
+
           if ("SCROLL_NORMAL"==parsedInput || "SN"==parsedInput || "sn"==parsedInput) {
             type=SCROLL_NORMAL;
           }
@@ -409,7 +400,7 @@ int parseInput(string input){
       //produce(q,"update_titreur");
       if(!timertitreur)produce(q,"start_timer_for_titreur");
     }
-    
+
     if ("setlight"==parsedInput) {
       //change light
       int fade=0;
@@ -436,7 +427,7 @@ int parseInput(string input){
         }
       }
     }// end setlight
-    
+
     if ("setgyro"==parsedInput) {
       //change gyro flex led
       int speed=350;
@@ -457,10 +448,10 @@ int parseInput(string input){
         if ("-strob"==parsedInput){
           ss>>strob;
         }
-        
+
       }
     }// end setgyro
-    
+
     if ("setrelais"==parsedInput) {
       //change onboard relais state
       while (ss>>parsedInput){
@@ -470,10 +461,10 @@ int parseInput(string input){
         if ("-off"==parsedInput){
           mycarte.setRelais(0);
         }
-        
+
       }
     }
-    
+
     if ("setledtelecook"==parsedInput) {
       //green led under ok push on remote
       while (ss>>parsedInput){
@@ -483,10 +474,10 @@ int parseInput(string input){
         if ("-off"==parsedInput){
           myteleco.setLedOk(0);
         }
-        
+
       }
     }
-    
+
     if ("setledcarteok"==parsedInput) {
       //green led under right of carte
       while (ss>>parsedInput){
@@ -496,10 +487,10 @@ int parseInput(string input){
         if ("-off"==parsedInput){
           mycarte.setledG(0);
         }
-        
+
       }
     }
-    
+
     if ("settelecolock"==parsedInput) {
       //set lock status on remote
       while (ss>>parsedInput){
@@ -521,7 +512,7 @@ int parseInput(string input){
         }
       }
     }
-    
+
     if ("DR"==parsedInput) {
       //direct access of carte register for debug
       int reg = 0;
@@ -546,7 +537,7 @@ int parseInput(string input){
         mycarte.writeValue(reg,val,fade);
       }
     }// end directaccess
-    
+
     if ("testroutine"==parsedInput) {
       //start testroutine
       int nbr = 1;
@@ -557,9 +548,9 @@ int parseInput(string input){
       }
       fprintf(stderr, "main - test routine\n");
       testRoutine(nbr);
-      
+
     }// end testroutine
-    
+
   }
   return 1;
 }
@@ -608,7 +599,7 @@ void consume(Queue<string>& q) {
 //one reader, execute order one by one
 thread consumer(bind(&consume, ref(q)));
 
-  
+
 void killthread() {
   produce(q,"kill");
   consumer.join();
@@ -637,11 +628,11 @@ void myInterruptTELECO(void) {
 
 
 int main (int argc, char * argv[]){
-  
+
   //catch exit signal
   signal(SIGTERM, beforekill);
   signal(SIGINT, beforekill);
-  
+
   wiringPiSetupGpio();
   pinMode (21, INPUT);
   pinMode (20, INPUT);
@@ -657,9 +648,7 @@ int main (int argc, char * argv[]){
   consumer.join();
 
   exit(0);
-  
+
   return 0;
-  
+
 }
-
-
